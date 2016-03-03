@@ -12,7 +12,7 @@ public class IdentifierExtractor{
 
 		//create parser and set of identifiers
 		ASTParser parser = ASTParser.newParser(AST.JLS3); 
-		HashSet<String> identifiers = new HashSet<String>();      
+		ArrayList<HashSet<String>> identifiers = new ArrayList<HashSet<String>>();
 
 		//explore directory
 		File folder = new File(args[0]);
@@ -40,10 +40,12 @@ public class IdentifierExtractor{
 					parser.setKind(ASTParser.K_COMPILATION_UNIT);			
 					CompilationUnit cu = (CompilationUnit) parser.createAST(null);  
 					IdentifierVisitor iv = new IdentifierVisitor(cu);
-					cu.accept(iv);
+					identifiers.add(iv.getIds());
 					HashSet<String> temp = iv.getIds();
 					for(String id : temp)
-						identifiers.add(id);
+						System.out.println(id);
+					System.out.println();					
+
 				}
 				catch(FileNotFoundException fnf){}
 
@@ -51,10 +53,11 @@ public class IdentifierExtractor{
 			else
 				if(curr.getName().endsWith(".java"))
 					System.err.println("Warning: file " + curr.getName() + " was not processed.");
-		}
+		
 
-		for(String id : identifiers)
-			System.out.println(id);
+		
+			}
+			
 
 	}
 
@@ -72,6 +75,7 @@ class IdentifierVisitor extends ASTVisitor{
 	public IdentifierVisitor(CompilationUnit cu){
 		this.cu = cu;
 		ids = new HashSet<String>();
+		cu.accept(this);
 	}
 
 	public boolean visit(MethodDeclaration node){
@@ -122,8 +126,21 @@ class IdentifierVisitor extends ASTVisitor{
 		ids.add(node.getName().getIdentifier());
 		return true;
 	}
+	public boolean visit(FieldDeclaration node){
+		List<VariableDeclarationFragment> vdfs = node.fragments();
+		for(VariableDeclarationFragment vdf : vdfs){
+			ids.add(vdf.getName().getIdentifier());
+		}
+		return true;
+	}
 
+	public boolean visit(FieldAccess node){
+		ids.add(node.getName().getIdentifier());
+		return true;
+	}
 	public HashSet<String> getIds(){
 		return ids;
 	}
+
+
 }
