@@ -13,14 +13,14 @@ public class IdentifierExtractor{
 		}
 
 		//create parser and set of identifiers
-		ASTParser parser = ASTParser.newParser(AST.JLS3); 
+		
 		ArrayList<HashSet<String>> identifiers = new ArrayList<HashSet<String>>();
 
 		//explore directory
 		File folder = new File(args[0]);
 		LinkedList<File> files =  new LinkedList<File>();	
 		File[] parseDirectory = folder.listFiles();
-		for(File f : parseDirectory)
+		for(File f :parseDirectory)
 			files.add(f);	
 
 		int count = 0;
@@ -28,13 +28,13 @@ public class IdentifierExtractor{
 			File curr = files.remove();
 			if(curr.isDirectory()){
 				parseDirectory = curr.listFiles();
-				for(File f: parseDirectory)
+				for(File f:parseDirectory)
 					files.add(f);
 			}
 			else if(curr.canRead() && curr.getName().endsWith(".java")){
-				count++;
 				System.out.println("Processing: " + curr.getName());		
 				try{
+					ASTParser parser = ASTParser.newParser(AST.JLS3); 
 					Scanner fr = new Scanner(curr);
 					StringBuffer sb = new StringBuffer();
 					while(fr.hasNextLine())
@@ -43,12 +43,9 @@ public class IdentifierExtractor{
 					parser.setSource(sb.toString().toCharArray());				
 					parser.setKind(ASTParser.K_COMPILATION_UNIT);			
 					CompilationUnit cu = (CompilationUnit) parser.createAST(null);  
-					IdentifierVisitor iv = new IdentifierVisitor(cu);
-					identifiers.add(iv.getIds());
-					HashSet<String> temp = iv.getIds();
-					for(String id : temp)
-						System.out.println(id);
-					System.out.println();					
+					IdentifierVisitor iv = new IdentifierVisitor(curr.getName());
+					cu.accept(iv);
+			
 
 				}
 				catch(FileNotFoundException fnf){}
@@ -70,78 +67,73 @@ public class IdentifierExtractor{
 
 class IdentifierVisitor extends ASTVisitor{
 
-	private CompilationUnit cu;
-	private HashSet<String> ids;
+	private String file;
 
-	public IdentifierVisitor(CompilationUnit cu){
-		this.cu = cu;
-		ids = new HashSet<String>();
-		cu.accept(this);
+	public IdentifierVisitor(String file){
+		this.file = file;
 	}
 
 	public boolean visit(MethodDeclaration node){
-		ids.add(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 
 	public boolean visit(VariableDeclarationFragment node){
-		ids.add(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 
 	public boolean visit(TypeDeclaration node){
-		ids.add(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 
 	public boolean visit(VariableDeclaration node){
-		ids.add(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 	public boolean visit(VariableDeclarationExpression node){
 
 		List<VariableDeclarationFragment> vdfs = node.fragments();
 		for(VariableDeclarationFragment vdf : vdfs){
-			ids.add(vdf.getName().getIdentifier());
+			System.out.println(file + ":" + vdf.getName().getIdentifier());
 		}
 		return true;
 	}
 	
 
 	public boolean visit(AnnotationTypeDeclaration node){
-		ids.add(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 
 	public boolean visit(AnnotationTypeMemberDeclaration node){
-		ids.add(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 
 	public boolean visit(EnumDeclaration node){
-		ids.add(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 
 	public boolean visit(EnumConstantDeclaration node){
-		ids.add(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 	public boolean visit(FieldDeclaration node){
 		List<VariableDeclarationFragment> vdfs = node.fragments();
 		for(VariableDeclarationFragment vdf : vdfs){
-			ids.add(vdf.getName().getIdentifier());
+			System.out.println(file + ":" + vdf.getName().getIdentifier());
 		}
 		return true;
 	}
 
 	public boolean visit(FieldAccess node){
-		ids.add(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
-	public HashSet<String> getIds(){
-		return ids;
-	}
-
 
 }
+
+
