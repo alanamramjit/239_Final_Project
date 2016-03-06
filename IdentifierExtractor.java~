@@ -114,7 +114,7 @@ class IdentifierVisitor extends ASTVisitor{
 	}
 
 	public boolean visit(EnumConstantDeclaration node){
-		System.out.println(node.getName().getIdentifier());
+		System.out.println.add(node.getName().getIdentifier());
 		return true;
 	}
 	public boolean visit(FieldDeclaration node){
