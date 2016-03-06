@@ -16,5 +16,11 @@ object SimpleMetrics {
 		val unique = lines.distinct()
 		val uniqueCount = unique.map(line => (line.split(':')(0), 1)).reduceByKey(_ + _)
 		uniqueCount.saveAsTextFile("unique-count")
+		// GitPython inputs
+		val gitpy = sc.textFile("gitpy")
+		val fixes = gitpy.map(line => line.split(':'))
+		val avg-rel = avg.join(fixes)
+		val uni-rel = unique.join(fixes)
+
 	}
 }
