@@ -18,18 +18,18 @@ public class IdentifierExtractor{
 		File folder = new File(args[0]);
 		LinkedList<File> files =  new LinkedList<File>();	
 		File[] parseDirectory = folder.listFiles();
-		for(File f : parseDirectory)
+		for(File f :parseDirectory)
 			files.add(f);	
 
 		while(!files.isEmpty()){		
 			File curr = files.remove();
 			if(curr.isDirectory()){
 				parseDirectory = curr.listFiles();
-				for(File f: parseDirectory)
+				for(File f:parseDirectory)
 					files.add(f);
 			}
 			else if(curr.canRead() && curr.getName().endsWith(".java")){
-				System.out.println("Processing: " + curr.getName());				
+				//System.out.println("Processing: " + curr.getName());				
 				try{
 					ASTParser parser = ASTParser.newParser(AST.JLS3); 
 					Scanner fr = new Scanner(curr);
@@ -40,7 +40,7 @@ public class IdentifierExtractor{
 					parser.setSource(sb.toString().toCharArray());				
 					parser.setKind(ASTParser.K_COMPILATION_UNIT);			
 					CompilationUnit cu = (CompilationUnit) parser.createAST(null);  
-					IdentifierVisitor iv = new IdentifierVisitor();
+					IdentifierVisitor iv = new IdentifierVisitor(curr.getName());
 					cu.accept(iv);
 			
 
@@ -67,66 +67,70 @@ public class IdentifierExtractor{
 
 class IdentifierVisitor extends ASTVisitor{
 
+	private String file;
 
+	public IdentifierVisitor(String file){
+		this.file = file;
+	}
 
 	public boolean visit(MethodDeclaration node){
-		System.out.println(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 
 	public boolean visit(VariableDeclarationFragment node){
-		System.out.println(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 
 	public boolean visit(TypeDeclaration node){
-		System.out.println(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 
 	public boolean visit(VariableDeclaration node){
-		System.out.println(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 	public boolean visit(VariableDeclarationExpression node){
 
 		List<VariableDeclarationFragment> vdfs = node.fragments();
 		for(VariableDeclarationFragment vdf : vdfs){
-			System.out.println(vdf.getName().getIdentifier());
+			System.out.println(file + ":" + vdf.getName().getIdentifier());
 		}
 		return true;
 	}
 	
 
 	public boolean visit(AnnotationTypeDeclaration node){
-		System.out.println(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 
 	public boolean visit(AnnotationTypeMemberDeclaration node){
-		System.out.println(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 
 	public boolean visit(EnumDeclaration node){
-		System.out.println(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 
 	public boolean visit(EnumConstantDeclaration node){
-		System.out.println(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 	public boolean visit(FieldDeclaration node){
 		List<VariableDeclarationFragment> vdfs = node.fragments();
 		for(VariableDeclarationFragment vdf : vdfs){
-			System.out.println(vdf.getName().getIdentifier());
+			System.out.println(file + ":" + vdf.getName().getIdentifier());
 		}
 		return true;
 	}
 
 	public boolean visit(FieldAccess node){
-		System.out.println(node.getName().getIdentifier());
+		System.out.println(file + ":" + node.getName().getIdentifier());
 		return true;
 	}
 
