@@ -4,7 +4,10 @@ import org.apache.spark.SparkConf
 
 object SimpleMetrics {
 	def main(args: Array[String]) {
-		val conf = new SparkConf().setAppName("Simple Application")
+		val conf = new SparkConf()
+		conf.setMaster("local[1]")
+		conf.setAppName("Simple Application")
+		
 		val sc = new SparkContext(conf)
 		val lines = sc.textFile("formatted")
 		// Below are for the avg identifier length

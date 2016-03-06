@@ -6,6 +6,8 @@ import git
 
 def getRepo(remote_url, dst_path):
 	if os.path.exists(dst_path) == False:
+		if remote_url is None:
+			sys.exit('Local repo does not exist! Please provide a valid remote URL!')
 		repo = git.Repo.clone_from(remote_url, dst_path)
 	else:
 		repo = git.Repo(dst_path)
@@ -35,19 +37,23 @@ def extractBugPerFile(repo, dst_path, key_words):
 	for file in java_files:
 		log = repo.git.log(key_words, '-i', '--pretty=format:%s', '--', file)
 		count = len(log.encode('utf-8').splitlines())
-		print os.path.relpath(file, 'jsoup')+': '+str(count)
+		(head, tail) = os.path.split(file)
+		print tail+':'+str(count)
 
 if __name__ == '__main__':
-	if len(sys.argv) < 3:
-		sys.exit('ERROR: At least two arguments are needed: remote repository URL and local repository path')
+	if len(sys.argv) < 2:
+		sys.exit('ERROR: At least one arguments is needed: local repository path')
+	elif(len(sys.argv)) == 2:
+		remote_url = None;
+	else:
+		remote_url = sys.argv[2];
 
 	key_words = ['--grep=^fix', '--grep=\sfix', '--grep=bug']
-
 	if len(sys.argv) > 3:
 		for i in range(3, len(sys.argv)):
 			key_words.append('--grep='+sys.argv[i])
 
-	dst_path = os.path.abspath(sys.argv[2])
-	localRepo = getRepo(sys.argv[1], dst_path)
+	dst_path = os.path.abspath(sys.argv[1])
+	localRepo = getRepo(remote_url, dst_path)
 	# extractTotalBug(localRepo, key_words)
 	extractBugPerFile(localRepo, dst_path, key_words)

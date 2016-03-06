@@ -1,2 +1,8 @@
 *.class
 jsoup/*
+junit/*
+project/*
+target/*
+avg-length/*
+unique-count/*
+
