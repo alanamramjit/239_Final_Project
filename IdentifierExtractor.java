@@ -1,7 +1,9 @@
 import java.util.*;
 import org.eclipse.jdt.core.dom.*;
 import java.io.*;
+
 public class IdentifierExtractor{
+	
 	public static void main(String [] args){
 
 		//check for directory
@@ -21,7 +23,8 @@ public class IdentifierExtractor{
 		for(File f : parseDirectory)
 			files.add(f);	
 
-		while(!files.isEmpty()){		
+		int count = 0;
+		while(!files.isEmpty()){
 			File curr = files.remove();
 			if(curr.isDirectory()){
 				parseDirectory = curr.listFiles();
@@ -29,7 +32,8 @@ public class IdentifierExtractor{
 					files.add(f);
 			}
 			else if(curr.canRead() && curr.getName().endsWith(".java")){
-				System.out.println("Processing: " + curr.getName());				
+				count++;
+				System.out.println("Processing: " + curr.getName());		
 				try{
 					Scanner fr = new Scanner(curr);
 					StringBuffer sb = new StringBuffer();
@@ -53,12 +57,9 @@ public class IdentifierExtractor{
 			else
 				if(curr.getName().endsWith(".java"))
 					System.err.println("Warning: file " + curr.getName() + " was not processed.");
-		
+		}
 
-		
-			}
-			
-
+		System.out.println("---->"+count);
 	}
 
 }
