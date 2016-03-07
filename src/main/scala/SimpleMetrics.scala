@@ -5,10 +5,10 @@ import org.apache.log4j.{Logger, Level}
 
 object SimpleMetrics {
 	def main(args: Array[String]) {
-		
+
 		Logger.getLogger("org").setLevel(Level.OFF)
 		val conf = new SparkConf()
-		conf.setMaster("local[1]")
+		conf.setMaster("local[4]")
 		conf.setAppName("Simple Application")
 		val sc = new SparkContext(conf)
 		val lines = sc.textFile("formatted")
@@ -27,6 +27,6 @@ object SimpleMetrics {
 		val gitpy = sc.textFile("bugs.txt")
 		val fixes = gitpy.map(line => (line.split(':')(0), line.split(':')(1)))
 		val joined = fixes.join(avg).join(uniqueCount)
-		joined.map(item => (item._1+','+item._2._1._1+','+item._2._1._2+','+item._2._2)).saveAsTextFile("all")
+		joined.map(item => (item._1+','+item._2._1._1+','+item._2._1._2+','+item._2._2)).repartition(1).saveAsTextFile("all")
 	}
 }
