@@ -14,7 +14,7 @@ object Metrics {
 		val lines = sc.textFile("method_ids")
 
 		val words = lines.map(line => (line.split(':')(0) + ":" + line.split(':')(1), line.split(':')(2)))
-		val tokens = words.flatMapValues(word => word.split("_")).flatMapValues(word => word.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|(?<=[0-9])(?=[A-Z][a-z])|(?<=[a-zA-Z])(?=[0-9])"))
+		val tokens = words.flatMapValues(word => word.split("_")).flatMapValues(word => word.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|(?<=[0-9])(?=[A-Z][a-z])|(?<=[a-zA-Z])(?=[0-9])|(?<=[0-9])(?=[a-z])"))
 		tokens.saveAsTextFile("tokens")
 
 		// Below are for the avg identifier length / per method 
