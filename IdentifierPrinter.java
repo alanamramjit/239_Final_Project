@@ -45,25 +45,8 @@ public class IdentifierPrinter {
 					// prints the resulting compilation unit to default system output
 					MyVisitor mv = new MyVisitor(curr.getName(), args[1]);
 					mv.visit(cu, null);
-					HashMap<String, HashSet<String>> map = mv.getMethodMap();
-					Set<String> keys = map.keySet();
-					FileWriter pw = new FileWriter(args[1] + "_method_map.txt", true);
-					try{
-						String line = "";
-						for(String k : keys){
-							HashSet<String> callees = map.get(k);
-							line += k + ":<";
-							for(String m : callees){
-								line += m + ",";
-							}
-							line = line.substring(0, line.lastIndexOf(","));
-							line += ">\n";
-							pw.write(line);
-							line = "";
-						}
-					}
-					catch(Exception ioe){}
-					pw.close();
+					mv.close();
+
 				}
 				catch(FileNotFoundException fnf){}
 			}
@@ -77,6 +60,7 @@ class MyVisitor extends VoidVisitorAdapter
 	private String output;
 	private FileWriter all_ids;
 	private FileWriter method_ids;
+	private FileWriter pw;
 	private ArrayList<String> currMethod;
 	private Stack<Integer> lastMethodEnd;
 	private HashMap<String, HashSet<String>> method_map;	
@@ -87,6 +71,7 @@ class MyVisitor extends VoidVisitorAdapter
 		currMethod = new ArrayList<String>();
 		all_ids = new FileWriter(output + "_all_ids.txt", true);
 		method_ids = new FileWriter(output + "_method_ids.txt", true);
+		pw = new FileWriter(output + "_method_map.txt", true);
 		lastMethodEnd = new Stack<Integer>();
 		method_map = new HashMap<String, HashSet<String>>();
 
@@ -197,8 +182,27 @@ class MyVisitor extends VoidVisitorAdapter
 
 	}
 
-	public HashMap<String, HashSet<String>> getMethodMap(){
-		return method_map;
-	}
+	public void close(){
+		Set<String> keys = method_map.keySet();
+		try{
+			all_ids.close();
+			method_ids.close();
+			String line = "";
+			for(String k : keys){
+				HashSet<String> callees = method_map.get(k);
+				line += k + ":<";
+				for(String m : callees){
+					line += m + ",";
+				}
+				line = line.substring(0, line.lastIndexOf(","));
+				line += ">\n";
+				pw.write(line);
+				line = "";
+			}
+			pw.close();
 
+		}
+		catch(IOException ioe){}
+
+	}
 }
