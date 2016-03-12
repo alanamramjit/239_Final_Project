@@ -9,4 +9,4 @@ then
 	exit 1
 fi
 	javac -cp "javaparser.jar:." IdentifierPrinter.java
-	java -cp "javaparser.jar:." IdentifierPrinter $1 ${2}_output.txt
+	java -cp "javaparser.jar:." IdentifierPrinter $1 $2
