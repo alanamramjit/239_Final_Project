@@ -14,4 +14,3 @@ sbt run #spark-submit --class "SimpleMetrics" target/scala-2.10/simple-project_2
 mv all/part-00000 ../${REPO}_all
 mv bugs bugs_${REPO}.txt
 rm -rf all
-

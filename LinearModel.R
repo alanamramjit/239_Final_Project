@@ -1,56 +1,48 @@
-# setwd('/Users/shaghayegh/Courses/Winter16/CS239/FinalProject')
+setwd('/Users/shaghayegh/Courses/Winter16/CS239/FinalProject')
 # install.packages("Hmisc",dependencies = TRUE)
 library(DAAG)
 library(Hmisc)
-# mydata <- read.csv('metrics-2.csv')
-mydata <- read.csv('5repo_all.csv')
+mydata <- read.csv('new-metrics.csv')
 # mydata$bug_fixes <- factor(mydata$bug_fixes)
-# y <- mydata[2]
-# x <- mydata[3:4]
+y <- mydata[2]
+x <- mydata[3:9]
 
-rcorr(as.matrix(mydata[2:4]), type="spearman")
-rcorr(as.matrix(mydata[2:4]), type="pearson")
+rcorr(as.matrix(mydata[2:9]), type="spearman")
+rcorr(as.matrix(mydata[2:9]), type="pearson")
 
-lr_1 <- lm(bug_fixes~unique,data=mydata)
-str(summary(lr_1))
-rmse_1 <- sqrt(mean(lr_1$residuals^2))
-dev.new()
-par(mfrow=c(1,1))
-plot(fitted(lr_1), ylab="Predicted (green) and Actual (red) bug fixes", xlab="Files", col="green")
-points(mydata$bug_fixes, col="red")
-#---------
+lr_1 <- lm(bug_fixes~id_unique, data=mydata)
+summary(lr_1)$adj.r.squared #0.445
 
-predicted_1 <- fitted(lr_1)
-rcorr(predicted_1, as.matrix(mydata[2]), type="spearman")
-
-lr_2 <- lm(bug_fixes~unique+avg_len, data=mydata)
-str(summary(lr_2))
+lr_2 <- lm(bug_fixes~id_unique+id_avg, data=mydata)
+summary(lr_2)$adj.r.squared #---- adj. R^2 = 0.468
 rmse_2 <- sqrt(mean(lr_2$residuals^2))
 
+lr_3 <- lm(bug_fixes~id_unique+id_avg+method_avg, data=mydata)
+summary(lr_3)$adj.r.squared #---- adj. R^2 = 0.454
+
+lr_4 <- lm(bug_fixes~id_unique+method_avg, data=mydata)
+summary(lr_4)$adj.r.squared #---- adj. R^2 = 0.455 drop id_avg
+
+lr_5 <- lm(bug_fixes~id_unique+method_avg+method_unique, data=mydata)
+summary(lr_5)$adj.r.squared #---- adj. R^2 = 0.634
+
+lr_6 <- lm(bug_fixes~id_unique+method_avg+method_unique+token_avg, data=mydata)
+summary(lr_6)$adj.r.squared #---- adj. R^2 = 0.628
+
+lr_7 <- lm(bug_fixes~id_unique+method_avg+method_unique+token_avg+token_unique, data=mydata)
+summary(lr_7)$adj.r.squared #---- adj. R^2 = 0.619
+
+lr_8 <- lm(bug_fixes~id_unique+method_avg+method_unique+token_unique, data=mydata)
+summary(lr_8)$adj.r.squared #---- adj. R^2 = 0.626 #---- drop token_avg
+
+lr_9 <- lm(bug_fixes~id_unique+method_avg+method_unique+token_unique+file_size, data=mydata)
+summary(lr_9)$adj.r.squared #---- adj. R^2 = 0.780
+
+lr_10 <- lm(bug_fixes~id_unique+method_avg+method_unique+file_size, data=mydata)
+summary(lr_10)$adj.r.squared #---- adj. R^2 = 0.7889 #----drop token_unique
+
+#---------------------------------
 dev.new()
 par(mfrow=c(1,1))
-plot(fitted(lr_1), ylab="Predicted (blue) and Actual (red) bug fixes", xlab="Files", col="blue")
+plot(fitted(lr_10), ylab="Predicted (green) and Actual (red) bug fixes", xlab="Files", col="green")
 points(mydata$bug_fixes, col="red")
-#----------
-
-predicted_2 <- fitted(lr_2)
-rcorr(predicted_2, as.matrix(mydata[2]), type="spearman")
-
-
-# cross_v5 <- CVlm(data=mydata, form.lm=lr, m=3)
-# dev.new()
-# par(mfrow=c(1,1))
-# plot(fitted(lr), ylab="Predicted (green) and Actual (red) bug fixes", xlab="Files", col="green")
-
-# regression <- glm(bug_fixes~unique, data=mydata, family="binomial")
-# cross_v5_reg<- CVlm(data=mydata, form.lm=regression, m=3)
-# dev.new()
-# par(mfrow=c(1,1))
-# plot(fitted(regression), ylab="Predicted (green) and Actual (red) bug fixes", xlab="Files", col="green")
-# points(mydata$bug_fixes, col="red")
-
-# res <- stack(data.frame(Observed = mydata$bug_fixes, Predicted=fitted(lr_1)))
-# res <- cbind(res, x=rep(mydata$unique, 2))
-# head(res)
-# require("lattice")
-# xyplot(values ~ x, data = res, group = ind, auto.key = TRUE)
