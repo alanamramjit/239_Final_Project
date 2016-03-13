@@ -38,7 +38,7 @@ def extractBugPerFile(repo, dst_path, key_words):
 		log = repo.git.log(key_words, '-i', '--pretty=format:%s', '--', file)
 		count = len(log.encode('utf-8').splitlines())
 		(head, tail) = os.path.split(file)
-		print tail+':'+str(count)
+		print tail+':'+str(count)+':'+str(os.path.getsize(file))
 
 if __name__ == '__main__':
 	if len(sys.argv) < 2:
