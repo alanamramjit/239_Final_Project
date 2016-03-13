@@ -120,14 +120,10 @@ class MyVisitor extends VoidVisitorAdapter
 		clearStack(n.getBeginLine());
 		if(!lastMethodEnd.isEmpty()){
 			for(String s : currMethod){
-				if(method_map.containsKey(s)){
-					method_map.get(s).add(n.getName());
-				}
-				else{
-					method_map.put(s, new HashSet<String>());
-					method_map.get(s).add(n.getName());
-				}
-
+			try{	
+				pw.write(file + ":" + s + ":" + n.getName() + "\n");	
+			   }
+			   catch(IOException ioe){}
 			}
 		}
 
@@ -183,23 +179,12 @@ class MyVisitor extends VoidVisitorAdapter
 	}
 
 	public void close(){
-		Set<String> keys = method_map.keySet();
+
 		try{
 			all_ids.close();
 			method_ids.close();
-			String line = "";
-			for(String k : keys){
-				HashSet<String> callees = method_map.get(k);
-				line += k + ":<";
-				for(String m : callees){
-					line += m + ",";
-				}
-				line = line.substring(0, line.lastIndexOf(","));
-				line += ">\n";
-				pw.write(line);
-				line = "";
-			}
 			pw.close();
+
 
 		}
 		catch(IOException ioe){}
