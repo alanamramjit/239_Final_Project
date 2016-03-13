@@ -1,8 +1,10 @@
 *.class
 jsoup/*
 junit/*
-project/*
-target/*
+*/project/*
+*/target/*
 avg-length/*
 unique-count/*
 all/*
+*_method_*
+*_all*

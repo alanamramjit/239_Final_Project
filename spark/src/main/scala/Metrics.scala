@@ -8,7 +8,7 @@ object Metrics {
 
 		Logger.getLogger("org").setLevel(Level.OFF)
 		val conf = new SparkConf()
-		conf.setMaster("local[1]")
+		conf.setMaster("local[4]")
 		conf.setAppName("Metrics Application")
 		val sc = new SparkContext(conf)
 		val ids = sc.textFile("method_ids")
@@ -46,11 +46,12 @@ object Metrics {
 		val tokens_uniqueCount = tokens.distinct().mapValues(x => 1).reduceByKey(_ + _)
 
 		//GitPython inputs
-		val gitpy = sc.textFile("bugs.txt")
-		val fixes = gitpy.map(line => (line.split(':')(0), line.split(':')(1)))
-		val joined = fixes.join(id_avg).join(id_uniqueCount).join(method_avg).join(method_uniqueCount).join(tokens_avg).join(tokens_uniqueCount)
-		joined.saveAsTextFile("joined")
-		//val file_bugs_idavg_iduni = joined.map(item => (item._1+','+item._2._1._1+','+item._2._1._2+','+item._2._2))
-		//file_bugs_idavg_iduni.saveAsTextFile("all")
+		val gitpy = sc.textFile("bugs")
+		val fixes = gitpy.map(line => (line.split(':')(0), (line.split(':')(1), line.split(':')(2))))
+		val joined = fixes.join(id_avg).map(item => (item._1, item._2._1._1+','+item._2._1._2+','+item._2._2))
+					.join(id_uniqueCount).join(method_avg).map(item => (item._1, item._2._1._1+','+item._2._1._2+','+item._2._2))
+					.join(method_uniqueCount).join(tokens_avg).map(item => (item._1, item._2._1._1+','+item._2._1._2+','+item._2._2))
+					.join(tokens_uniqueCount).map(item => item._1+','+item._2._1+','+item._2._2)
+		joined.saveAsTextFile("all")
 	}
 }
