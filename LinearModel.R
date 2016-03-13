@@ -12,9 +12,11 @@ rcorr(as.matrix(mydata[2:9]), type="pearson")
 
 lr_1 <- lm(bug_fixes~id_unique, data=mydata)
 summary(lr_1)$adj.r.squared #0.445
+summary(lr_1)$r.squared
 
 lr_2 <- lm(bug_fixes~id_unique+id_avg, data=mydata)
 summary(lr_2)$adj.r.squared #---- adj. R^2 = 0.468
+summary(lr_2)$r.squared
 rmse_2 <- sqrt(mean(lr_2$residuals^2))
 
 lr_3 <- lm(bug_fixes~id_unique+id_avg+method_avg, data=mydata)
@@ -40,9 +42,10 @@ summary(lr_9)$adj.r.squared #---- adj. R^2 = 0.780
 
 lr_10 <- lm(bug_fixes~id_unique+method_avg+method_unique+file_size, data=mydata)
 summary(lr_10)$adj.r.squared #---- adj. R^2 = 0.7889 #----drop token_unique
+rmse_10 <- sqrt(mean(lr_10$residuals^2))
 
 #---------------------------------
 dev.new()
 par(mfrow=c(1,1))
-plot(fitted(lr_10), ylab="Predicted (green) and Actual (red) bug fixes", xlab="Files", col="green")
+plot(fitted(lr_9), ylab="Predicted (green) and Actual (red) bug fixes", xlab="Files", col="green")
 points(mydata$bug_fixes, col="red")
